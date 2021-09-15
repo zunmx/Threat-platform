@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta charset="utf-8" />
+	<title>实时网络威胁预警平台</title>
+	<meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+	<link rel="icon" href="../assets/img/icon.ico" type="image/x-icon" />
+
+	<!-- Fonts and icons -->
+	<script src="../assets/js/plugin/webfont/webfont.min.js"></script>
+	<script src="../assets/js/angular.js"></script>
+	<script src="../assets/js/index.js"></script>
+	<script>
+		WebFont.load({
+			google: { "families": ["Lato:300,400,700,900"] },
+			custom: { "families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['../assets/css/fonts.min.css'] },
+			active: function () {
+				sessionStorage.fonts = true;
+			}
+		});
+	</script>
+
+	<!-- CSS Files -->
+	<link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../assets/css/atlantis.min.css">
+
+	<!-- CSS Just for demo purpose, don't include it in your project -->
+	<link rel="stylesheet" href="../assets/css/demo.css">
+</head>
+<!-- Cyber threat early warning platform  -->
+
+<body data-background-color="dark" ng-app="CTEWP" ng-controller="base" ng-init="init()">
+	<div class="content">
+		<div class="page-inner">
+			<div class="mt-2 mb-4">
+				<h2 class="text-white pb-2">实时网络威胁预警平台</h2>
+				<h5 class="text-white op-7 mb-4">基于实时诱捕陷阱原理的扫描干扰以及预警平台</h5>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="card card-dark bg-primary-gradient">
+						<div class="card-body pb-0">
+							<div class="h1 fw-bold float-right" id="d0">{{value.visitorNum}}%</div>
+							<h2 class="mb-2">{{visitor.visitorNum6[0]}}</h2>
+							<p>访问量/天</p>
+							<div class="pull-in sparkline-fix chart-as-background">
+								<div id="lineChart"><canvas width="327" height="70"
+										style="display: inline-block; width: 327px; height: 70px; vertical-align: top;"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card card-dark bg-secondary-gradient">
+						<div class="card-body pb-0">
+							<div class="h1 fw-bold float-right" id="d1">{{value.newIpNum}}%</div>
+							<h2 class="mb-2">{{visitor.newIpNum6[0]}}</h2>
+							<p>不同IP数/天</p>
+							<div class="pull-in sparkline-fix chart-as-background">
+								<div id="lineChart2"><canvas width="327" height="70"
+										style="display: inline-block; width: 327px; height: 70px; vertical-align: top;"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card card-dark bg-success2">
+						<div class="card-body pb-0">
+							<div class="h1 fw-bold float-right" id="d2">{{value.portNum}}%</div>
+							<h2 class="mb-2">{{visitor.portNum6[0]}}</h2>
+							<p>不同端口数/天</p>
+							<div class="pull-in sparkline-fix chart-as-background">
+								<div id="lineChart3"><canvas width="327" height="70"
+										style="display: inline-block; width: 327px; height: 70px; vertical-align: top;"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<div class="card-head-row">
+								<div class="card-title">攻击IP时间分布</div>
+								<div class="card-tools">
+								</div>
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="chart-container" style="min-height: 375px">
+								<canvas id="statisticsChart"></canvas>
+							</div>
+							<div id="myChartLegend"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+			<div class="row row-card-no-pd">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<div class="card-head-row">
+								<h4 class="card-title">访问源</h4>
+							</div>
+							<p class="card-category">
+								近10条攻击源发自的地域</p>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="table-responsive table-hover table-sales">
+										<table id="basic-datatables" class="display table table-striped table-hover">
+											<thead>
+												<tr>
+													<th>IP</th>
+													<th>端口</th>
+													<th>标识</th>
+													<th>服务</th>
+													<th>访问时间</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr ng-repeat="x in visitor.bef100">
+													<td>{{x.sourceIP}}</td>
+													<td>{{x.targetPort}}</td>
+													<td>{{x.flag}}</td>
+													<th>{{x.service}}</th>
+													<td>{{x.intime}}</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="card">
+						<div class="card-header">
+							<div class="card-title">TOP15 攻击IP</div>
+						</div>
+						<div class="card-body pb-0">
+							<div class="d-flex" ng-repeat="x in visitor.ip10">
+								<div class="icon-preview" style="zoom: 200%;"><i class="fas fa-desktop"></i></div>
+								<div class="flex-1 pt-1 ml-2">
+									<h4 class="h4 fw-bold text-danger">{{x.sourceIP}}</h4>
+									<!-- <small class="text-muted">{{x.locate}}</small> -->
+								</div>
+								<div class="d-flex ml-auto align-items-center">
+									<h3 class="text-info fw-bold">{{x.sec}}</h3>
+								</div>
+							</div>
+							<div class="separator-dashed"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card">
+						<div class="card-header">
+							<div class="card-title">TOP15 攻击端口</div>
+						</div>
+						<div class="card-body pb-0">
+							<div class="d-flex" ng-repeat="x in visitor.port10">
+								<div class="icon-preview" style="zoom: 200%;"><i class="fab fa-megaport"></i></div>
+								<div class="flex-1 pt-1 ml-2">
+									<h4 class="h4 fw-bold text-danger">{{x.targetPort}}</h4>
+									<span class="text-muted">{{x.service}}</span>
+								</div>
+								<div class="d-flex ml-auto align-items-center">
+									<h3 class="text-info fw-bold">{{x.sec}}</h3>
+								</div>
+							</div>
+							<div class="separator-dashed"></div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card card-primary bg-primary-gradient">
+						<div class="card-body">
+							<h4 class="mt-3 b-b1 pb-2 mb-4 fw-bold">访问次数总量</h4>
+							<h1 class="mb-4 fw-bold">{{total}}</h1>
+							<h4 class="mt-5 pb-3 mb-0 fw-bold">威胁信息排行</h4>
+							<ul class="list-unstyled">
+								<li class="d-flex justify-content-between pb-1 pt-1" ng-repeat="x in visitor.warn">
+									<small>{{x.flag}}</small> <span>{{x.sec}}</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4" ng-if="false">
+					<div class="card">
+						<div class="card-header">
+							<div class="card-title">Feed Activity</div>
+						</div>
+						<div class="card-body">
+							<ol class="activity-feed">
+								<li class="feed-item feed-item-secondary">
+									<time class="date" datetime="9-25">Sep 25</time>
+									<span class="text">Responded to need <a href="#">"Volunteer
+											opportunity"</a></span>
+								</li>
+								<li class="feed-item feed-item-success">
+									<time class="date" datetime="9-24">Sep 24</time>
+									<span class="text">Added an interest <a href="#">"Volunteer
+											Activities"</a></span>
+								</li>
+								<li class="feed-item feed-item-info">
+									<time class="date" datetime="9-23">Sep 23</time>
+									<span class="text">Joined the group <a href="single-group.php">"Boardsmanship
+											Forum"</a></span>
+								</li>
+								<li class="feed-item feed-item-warning">
+									<time class="date" datetime="9-21">Sep 21</time>
+									<span class="text">Responded to need <a href="#">"In-Kind
+											Opportunity"</a></span>
+								</li>
+								<li class="feed-item feed-item-danger">
+									<time class="date" datetime="9-18">Sep 18</time>
+									<span class="text">Created need <a href="#">"Volunteer
+											Opportunity"</a></span>
+								</li>
+								<li class="feed-item">
+									<time class="date" datetime="9-17">Sep 17</time>
+									<span class="text">Attending the event <a href="single-event.php">"Some New
+											Event"</a></span>
+								</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer class="footer">
+			<div class="container-fluid">
+				<nav class="pull-left">
+					<ul class="nav">
+						<li class="nav-item">
+							<a class="nav-link" href="https://www.zunmx.top">
+								回到首页
+							</a>
+						</li>
+					</ul>
+				</nav>
+				<div class="copyright ml-auto">
+					<span class="text-ellipsis">©&nbsp;2021 Copyright&nbsp;ICP<a href="http://beian.miit.gov.cn/"
+							target="_blank"> 冀ICP备2021007408号</a> </span>
+				</div>
+			</div>
+		</footer>
+	</div>
+
+
+	<!--   Core JS Files   -->
+	<script src="../assets/js/core/jquery.3.2.1.min.js"></script>
+	<script src="../assets/js/core/popper.min.js"></script>
+	<script src="../assets/js/core/bootstrap.min.js"></script>
+
+	<!-- jQuery UI -->
+	<script src="../assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+	<script src="../assets/js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+
+	<!-- jQuery Scrollbar -->
+	<script src="../assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+
+
+	<!-- Chart JS -->
+	<script src="../assets/js/plugin/chart.js/chart.min.js"></script>
+
+	<!-- jQuery Sparkline -->
+	<script src="../assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+
+	<!-- Chart Circle -->
+	<script src="../assets/js/plugin/chart-circle/circles.min.js"></script>
+
+	<!-- Datatables -->
+	<script src="../assets/js/plugin/datatables/datatables.min.js"></script>
+
+	<!-- Bootstrap Notify -->
+	<script src="../assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+
+	<!-- Sweet Alert -->
+	<script src="../assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+
+	<script>
+
+	</script>
+</body>
+
+</html>
