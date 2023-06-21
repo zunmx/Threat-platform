@@ -24,4 +24,4 @@ telnet YOUR_IP_OR_DOMAIN YOUR_FAKE_PORT
 ```
 如果有数据返回并且数据库中存在刚刚访问的记录，即为成功。
 
-demo：https://www.zunmx.top/report/context/
+演示站已经关闭，不再提供线上演示
